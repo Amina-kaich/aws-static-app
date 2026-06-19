@@ -1,12 +1,10 @@
-# ☁️ Cloud Deployment on AWS — Static Web Application
-
-**Amina Kaich | ENIT Tunis — Telecommunications Engineering | 2026**
+# ☁️Cloud Deployment on AWS — Static Web Application
 
 Architecture serverless complète pour déployer une application web statique sur AWS, avec un backend RESTful basé sur API Gateway et Lambda.
 
 ---
 
-## 🏗️ Stack technique
+##  Stack technique
 
 `AWS S3` `CloudFront` `EC2` `Lambda` `API Gateway` `IAM` `CloudFormation` `Python 3.12`
 
@@ -34,7 +32,7 @@ aws_static_app/
 
 ---
 
-## 🎯 Ce que fait ce projet
+##  Ce que fait ce projet
 
 - Héberge un site statique sur **S3** avec distribution via **CloudFront** (CDN)
 - Expose une API REST via **API Gateway** connectée à une fonction **Lambda** (Python)
@@ -42,11 +40,11 @@ aws_static_app/
 - Définit toute l'infrastructure en **Infrastructure as Code** (CloudFormation) — reproductible et versionnée
 - Reste entièrement dans les limites du **Free Tier AWS**
 
-📖 Documentation complète de l'architecture : [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+ Documentation complète de l'architecture : [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 ---
 
-## 🚀 Déploiement
+##  Déploiement
 
 ### Prérequis
 
@@ -77,7 +75,7 @@ chmod +x scripts/cleanup.sh
 
 ---
 
-## 🧪 Tests
+##  Tests
 
 ```bash
 cd backend
@@ -88,15 +86,15 @@ python test_handler.py
 ```
 
 Tests couvrant :
-- ✅ Health check endpoint
-- ✅ Création de message de contact (succès)
-- ✅ Validation des champs requis (erreur 400)
-- ✅ Route inconnue (erreur 404)
-- ✅ Préflight CORS
+-  Health check endpoint
+-  Création de message de contact (succès)
+-  Validation des champs requis (erreur 400)
+-  Route inconnue (erreur 404)
+-  Préflight CORS
 
 ---
 
-## 🔐 Sécurité
+##  Sécurité
 
 - Aucune credential AWS n'est codée en dur — tout passe par les rôles IAM et la configuration locale d'AWS CLI
 - Le rôle Lambda suit le principe du moindre privilège (accès CloudWatch Logs uniquement)
@@ -105,7 +103,7 @@ Tests couvrant :
 
 ---
 
-## 💡 Points clés techniques
+##  Points clés techniques
 
 - **Infrastructure as Code** — toute l'infra est versionnée dans `template.yaml`, reproductible en une commande
 - **Serverless-first** — pas de serveur à patcher ou à monitorer pour le backend
@@ -114,10 +112,9 @@ Tests couvrant :
 
 ---
 
-## 📌 Statut
+##  Statut
 
-🚧 Architecture et code finalisés — déploiement sur compte AWS personnel en cours dans le cadre du Free Tier.
+ Architecture et code finalisés — déploiement sur compte AWS personnel en cours dans le cadre du Free Tier.
 
 ---
 
-*Projet académique — ENIT Tunis, Télécommunications, 2ème année*
