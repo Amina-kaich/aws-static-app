@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Infrastructure serverless pour application web statique.
+  Stack : S3 (hosting) + CloudFront (CDN) + Lambda + API Gateway + IAM.
+  Optimisé pour rester dans les limites du Free Tier AWS.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: amina-portfolio
+    Description: Préfixe utilisé pour nommer les ressources
+
+Resources:
+
+  # ─────────────────────────────────────────
+  # S3 — Hébergement du site statique
+  # ─────────────────────────────────────────
+  StaticSiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${ProjectName}-static-site"
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  StaticSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref StaticSiteBucket
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "${StaticSiteBucket.Arn}/*"
+
+  # ─────────────────────────────────────────
+  # CloudFront — CDN devant le bucket S3
+  # ─────────────────────────────────────────
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100 # Edge locations US/Europe — réduit les coûts
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt StaticSiteBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          ForwardedValues:
+            QueryString: false
+          Compress: true
+
+  # ─────────────────────────────────────────
+  # IAM — Rôle d'exécution Lambda (moindre privilège)
+  # ─────────────────────────────────────────
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: MinimalCloudWatchLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+
+  # ─────────────────────────────────────────
+  # Lambda — Fonction backend serverless
+  # ─────────────────────────────────────────
+  ApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${ProjectName}-api-handler"
+      Runtime: python3.12
+      Handler: handler.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 10
+      MemorySize: 128 # Reste dans le Free Tier (1M requêtes/mois gratuites)
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {"statusCode": 200, "body": "placeholder - deploy real code via CLI"}
+
+  # ─────────────────────────────────────────
+  # API Gateway — Point d'entrée REST
+  # ─────────────────────────────────────────
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub "${ProjectName}-api"
+      EndpointConfiguration:
+        Types: [REGIONAL]
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: "health"
+
+  ApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ApiResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations"
+          - LambdaArn: !GetAtt ApiFunction.Arn
+
+  LambdaApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApiFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/*"
+
+Outputs:
+  WebsiteURL:
+    Description: URL du site statique via CloudFront
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+
+  S3BucketName:
+    Description: Nom du bucket S3
+    Value: !Ref StaticSiteBucket
+
+  ApiEndpoint:
+    Description: Endpoint de l'API REST
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/health"

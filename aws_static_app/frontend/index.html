@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amina Kaich — Telecommunications & AI Engineering</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --text: #e6edf3;
+      --text-dim: #8b949e;
+      --accent: #58a6ff;
+      --accent-soft: rgba(88, 166, 255, 0.12);
+      --border: #30363d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 80px 24px 60px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      color: var(--text-dim);
+      margin-top: 12px;
+      font-size: 1.1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 6px 16px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: "SF Mono", Monaco, monospace;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    .architecture {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+
+    .architecture h2 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      color: var(--accent);
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 0.9rem;
+    }
+
+    .flow .node {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 10px 16px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .flow .arrow {
+      color: var(--text-dim);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card h3 {
+      color: var(--accent);
+      font-size: 1rem;
+      margin-bottom: 8px;
+      font-family: "SF Mono", Monaco, monospace;
+    }
+
+    .card p {
+      color: var(--text-dim);
+      font-size: 0.92rem;
+    }
+
+    .status {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 32px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3fb950;
+      box-shadow: 0 0 8px #3fb950;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      header h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Amina Kaich</h1>
+    <p>Telecommunications Engineering Student — ENIT Tunis</p>
+    <span class="badge">Serverless Architecture on AWS</span>
+  </header>
+
+  <main>
+
+    <div class="architecture">
+      <h2>Architecture du déploiement</h2>
+      <div class="flow">
+        <span class="node">Utilisateur</span>
+        <span class="arrow">→</span>
+        <span class="node">CloudFront (CDN)</span>
+        <span class="arrow">→</span>
+        <span class="node">S3 (static files)</span>
+      </div>
+      <div class="flow" style="margin-top: 16px;">
+        <span class="node">API Gateway</span>
+        <span class="arrow">→</span>
+        <span class="node">Lambda</span>
+        <span class="arrow">→</span>
+        <span class="node">IAM Roles</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>S3 Static Hosting</h3>
+        <p>Bucket configuré en hébergement de site statique public, servant les fichiers HTML/CSS/JS.</p>
+      </div>
+      <div class="card">
+        <h3>CloudFront CDN</h3>
+        <p>Distribution du contenu via les edge locations AWS pour réduire la latence globale.</p>
+      </div>
+      <div class="card">
+        <h3>EC2 (Ubuntu)</h3>
+        <p>Instance configurée avec accès SSH sécurisé et rôle IAM dédié pour les opérations backend.</p>
+      </div>
+      <div class="card">
+        <h3>Lambda + API Gateway</h3>
+        <p>Architecture RESTful serverless — exécution à la demande, sans serveur à maintenir.</p>
+      </div>
+    </div>
+
+    <div class="status">
+      <span class="dot"></span>
+      <span>Architecture documentée — Free Tier cost-optimized</span>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Déployé dans le cadre d'un projet académique — ENIT Telecommunications 2025-2026</p>
+    <p style="margin-top: 8px;">
+      <a href="https://github.com/Amina-kaich" target="_blank">github.com/Amina-kaich</a>
+    </p>
+  </footer>
+
+</body>
+</html>
