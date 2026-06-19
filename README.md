@@ -1,4 +1,4 @@
-# ☁️Cloud Deployment on AWS — Static Web Application
+# Cloud Deployment on AWS — Static Web Application
 
 Architecture serverless complète pour déployer une application web statique sur AWS, avec un backend RESTful basé sur API Gateway et Lambda.
 
@@ -10,7 +10,7 @@ Architecture serverless complète pour déployer une application web statique su
 
 ---
 
-## 📁 Structure du projet
+##  Structure du projet
 
 ```
 aws_static_app/
